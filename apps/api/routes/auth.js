@@ -38,7 +38,7 @@ router.get('/github/callback',
     const token = jwt.sign({ userId: req.user._id },
     process.env.JWT_SECRET,
   { expiresIn: '30d' })
-  res.redirect(`http://localhost:3000/auth/callback?token=${token}`)
+  res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`)
   }
 )
 
