@@ -2,10 +2,9 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env'
 const { Worker } = require('bullmq')
 const { connectDB } = require('@launchr/db')
 const { deployProcessor } = require('./processors/deploy')
-const connection = {
-  host: 'localhost',
-  port: 6379
-}
+const connection = process.env.REDIS_URL ? 
+  { url: process.env.REDIS_URL } : 
+  { host: 'localhost', port: 6379 }
 
 const processor = async (job) => {
   console.log("👀 Incoming job:", job.name, job.data); // ADD THIS
