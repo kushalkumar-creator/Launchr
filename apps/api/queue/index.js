@@ -1,10 +1,10 @@
-const { Queue } = require('bullmq')
+const { Queue } = require("bullmq");
 
-const connection = {
-  host: 'localhost',
-  port: 6379
-}
+const queue = new Queue("deployments", {
+  connection: {
+    host: "localhost",
+    port: 6379
+  }
+});
 
-const deploymentQueue = new Queue('deployments', { connection })
-
-module.exports = { deploymentQueue }
+module.exports = queue;

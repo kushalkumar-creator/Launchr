@@ -27,7 +27,7 @@ router.post('/',authMiddleware, async (req, res) => {
 })
 
 
-router.get('/:id',authMiddleware, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
       const id = req.params.id 
       const project = await Project.findById(id)

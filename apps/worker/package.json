@@ -8,6 +8,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@ngrok/ngrok": "^1.7.0",
     "bullmq": "^5.71.0",
     "dockerode": "^4.0.10",
     "dotenv": "^17.3.1",
