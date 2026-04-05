@@ -1,4 +1,10 @@
 require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env') })
+require('dotenv').config()
+console.log('ENV CHECK:', {
+  REDIS_URL: process.env.REDIS_URL ? 'SET' : 'NOT SET',
+  MONGODB_URI: process.env.MONGODB_URI ? 'SET' : 'NOT SET',
+  GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID ? 'SET' : 'NOT SET',
+})
 
 const express = require("express")
 const cors = require("cors")

@@ -1,14 +1,14 @@
 const { Queue } = require("bullmq")
-const { Redis } = require("ioredis")
 
-const redisConnection = new Redis(process.env.REDIS_URL, {
+console.log("REDIS_URL:", process.env.REDIS_URL) // temporary debug
+
+const connection = {
+  url: process.env.REDIS_URL || "redis://localhost:6379",
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
-  tls: process.env.REDIS_URL?.includes('rediss://') ? {} : undefined
-})
+  lazyConnect: true,
+}
 
-const queue = new Queue("deployments", {
-  connection: redisConnection
-})
+const queue = new Queue("deployments", { connection })
 
 module.exports = queue
