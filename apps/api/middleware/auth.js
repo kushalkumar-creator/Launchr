@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('@launchr/db/models/User')
+const User = require('../../../packages/db/models/User')
 
 module.exports = async function authMiddleware(req, res, next) {
   try {

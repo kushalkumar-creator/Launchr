@@ -1,4 +1,4 @@
-const Project = require('@launchr/db/models/Project')
+const Project = require('../../../packages/db/models/Project')
 const express = require('express')
 const router = express.Router()
 const authMiddleware = require('../middleware/auth')

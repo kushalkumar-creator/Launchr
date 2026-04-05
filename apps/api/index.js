@@ -2,7 +2,7 @@ require('dotenv').config({ path: require('path').resolve(__dirname, '../../.env'
 
 const express = require("express")
 const cors = require("cors")
-const { connectDB } = require('@launchr/db')
+const { connectDB } = require('../../packages/db/index')
 const passport = require('passport')
 
 const http = require("http")

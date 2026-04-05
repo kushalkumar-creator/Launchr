@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router()
 const mongoose = require("mongoose")
-const Deployment = require("../../../packages/db/models/Deployment")
-const Project = require("../../../packages/db/models/Project")
+const Deployment = require('../../../packages/db/models/Deployment')
+const Project = require('../../../packages/db/models/Project')
 const queue = require("../queue")
 const authMiddleware = require("../middleware/auth")
 
