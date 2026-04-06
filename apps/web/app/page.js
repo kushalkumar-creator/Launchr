@@ -49,7 +49,7 @@ export default function Home() {
 
         {/* CTA */}
         <a
-          href="http://localhost:4000/api/auth/github"
+          href={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/auth/github`}
           className="inline-flex items-center gap-3 bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-xl font-semibold text-base transition"
         >
           <svg className="w-5 h-5 fill-white" viewBox="0 0 24 24">

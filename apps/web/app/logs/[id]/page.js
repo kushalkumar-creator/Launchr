@@ -22,7 +22,7 @@ export default function LogsPage() {
         if (data?.status === "failed") setStatus("failed");
       });
 
-    const socket = io("http://localhost:4000");
+    const socket = io(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000')
     socket.emit("join", id);
 
     socket.on("log", (log) => {
