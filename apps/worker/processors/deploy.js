@@ -1,5 +1,9 @@
 const Redis = require("ioredis");
-const pub = new Redis();
+const pub = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: null,
+  enableReadyCheck: false,
+  tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined
+});
 
 const { exec, spawn } = require("child_process");
 const path = require("path");
