@@ -7,6 +7,7 @@ const { deployProcessor } = require('./processors/deploy')
 const redisConnection = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
+  tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined
 })
 
 const processor = async (job) => {
