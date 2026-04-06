@@ -15,6 +15,16 @@ const http = require("http")
 const { Server } = require("socket.io")
 const Redis = require("ioredis")
 
+process.on('unhandledRejection', (err) => {
+  console.error('Unhandled rejection:', err.message)
+  // don't crash on unhandled rejections
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err.message)
+  // don't crash on uncaught exceptions
+})
+
 const app = express()
 
 app.use(cors())

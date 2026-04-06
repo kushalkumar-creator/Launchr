@@ -1,14 +1,19 @@
 const { Queue } = require("bullmq")
+const { Redis } = require("ioredis")
 
-console.log("REDIS_URL:", process.env.REDIS_URL) // temporary debug
-
-const connection = {
-  url: process.env.REDIS_URL || "redis://localhost:6379",
+const redisClient = new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
   lazyConnect: true,
-}
+  retryStrategy: () => null  // never retry — fail silently
+})
 
-const queue = new Queue("deployments", { connection })
+redisClient.on('error', (err) => {
+  console.error('Redis connection error:', err.message)
+})
+
+const queue = new Queue("deployments", {
+  connection: redisClient
+})
 
 module.exports = queue
