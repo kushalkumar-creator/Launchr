@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 const pub = new Redis(process.env.REDIS_URL, {
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
-  tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined
+  tls: process.env.REDIS_URL?.startsWith("rediss://") ? {} : undefined,
 });
 
 const { exec, spawn } = require("child_process");
@@ -26,10 +26,7 @@ async function pushLog(deploymentId, log) {
   await Deployment.findByIdAndUpdate(deploymentId, {
     $push: { logs: log },
   });
-  await pub.publish(
-    "deployment-logs",
-    JSON.stringify({ deploymentId, log })
-  );
+  await pub.publish("deployment-logs", JSON.stringify({ deploymentId, log }));
 }
 
 async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
@@ -61,9 +58,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     if (!fs.existsSync(packageJsonPath)) {
       throw new Error("package.json not found");
     }
-    const packageJson = JSON.parse(
-      fs.readFileSync(packageJsonPath, "utf-8")
-    );
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
 
     let finalUrl = null;
 
@@ -74,7 +69,12 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execPromise(buildCmd || "npm run build", { cwd: projectPath });
+      await execPromise(
+        `bash -c "source ~/.nvm/nvm.sh && nvm use 20 && npm run build"`,
+        {
+          cwd: projectPath,
+        },
+      );
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
@@ -84,7 +84,8 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       if (fs.existsSync(distPath)) staticPath = distPath;
       else if (fs.existsSync(buildPath)) staticPath = buildPath;
 
-      if (!staticPath) throw new Error("Build folder not found (dist/ or build/)");
+      if (!staticPath)
+        throw new Error("Build folder not found (dist/ or build/)");
 
       await pushLog(deploymentId, "📦 Static build detected");
 
@@ -113,6 +114,9 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       // create ngrok tunnel for this port
       await pushLog(deploymentId, "🔗 Creating public URL...");
+      try {
+        await ngrok.disconnectAll();
+      } catch (e) {}
       const listener = await ngrok.forward({
         addr: port,
         authtoken: process.env.NGROK_AUTHTOKEN,
@@ -152,6 +156,9 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       // create ngrok tunnel
       await pushLog(deploymentId, "🔗 Creating public URL...");
+      try {
+        await ngrok.disconnectAll();
+      } catch (e) {}
       const listener = await ngrok.forward({
         addr: port,
         authtoken: process.env.NGROK_AUTHTOKEN,
@@ -178,7 +185,6 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     });
 
     await pushLog(deploymentId, "✅ Deployment successful 🚀");
-
   } catch (error) {
     console.error("❌ Deployment failed:", error);
     await pushLog(deploymentId, `❌ Error: ${error.toString()}`);
