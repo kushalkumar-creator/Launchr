@@ -74,7 +74,10 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execPromise(buildCmd || "npm run build", { cwd: projectPath });
+      await execPromise(
+  "npx --yes node@20.19.0 ./node_modules/.bin/npm run build",
+  { cwd: projectPath }
+);
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
