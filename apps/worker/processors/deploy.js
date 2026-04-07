@@ -127,7 +127,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     else if (packageJson.scripts?.start) {
       await pushLog(deploymentId, "🔥 Node app detected");
 
-      const child = spawn(packageJson.scripts.start, {
+      const child = spawn(`npx -y node@20 ${packageJson.scripts.start}`, {
         cwd: projectPath,
         env: { ...process.env, PORT: port },
         shell: true,
