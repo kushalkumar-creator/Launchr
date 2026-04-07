@@ -54,10 +54,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
     // install dependencies
     await pushLog(deploymentId, "📦 Installing dependencies...");
-    await execPromise(
-  "./node_modules/node/bin/node node_modules/npm/bin/npm-cli.js install",
-  { cwd: projectPath }
-);
+    await execPromise("npm install", { cwd: projectPath });
 
     // read package.json
     const packageJsonPath = path.join(projectPath, "package.json");
@@ -77,10 +74,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execPromise(
-  "./node_modules/node/bin/node node_modules/npm/bin/npm-cli.js run build",
-  { cwd: projectPath }
-);
+      await execPromise(buildCmd || "npm run build", { cwd: projectPath });
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
