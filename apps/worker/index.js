@@ -25,6 +25,7 @@ const processor = async (job) => {
 
 async function startWorker() {
   await connectDB()
+  require('./proxy')
 
   const worker = new Worker('deployments', processor, {
     connection: redisConnection

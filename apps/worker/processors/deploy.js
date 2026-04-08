@@ -70,12 +70,12 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "🏗️ Building project...");
 
       await execPromise(buildCmd || "npm run build", {
-  cwd: projectPath,
-  env: {
-    ...process.env,
-    NODE_ENV: "production"
-  }
-})
+        cwd: projectPath,
+        env: {
+          ...process.env,
+          NODE_ENV: "production",
+        },
+      });
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
@@ -114,16 +114,21 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, `🌐 Local URL: http://localhost:${port}`);
 
       // create ngrok tunnel for this port
+      // create ONE permanent tunnel to proxy (only if not already running)
       await pushLog(deploymentId, "🔗 Creating public URL...");
-      try {
-        await ngrok.disconnectAll();
-      } catch (e) {}
-      const listener = await ngrok.forward({
-        addr: port,
-        authtoken: process.env.NGROK_AUTHTOKEN,
-      });
 
-      finalUrl = listener.url();
+      try {
+        await ngrok.forward({
+          addr: 3500,
+          authtoken: process.env.NGROK_AUTHTOKEN,
+          domain: process.env.NGROK_STATIC_DOMAIN,
+        });
+      } catch (e) {
+        // tunnel already exists, that's fine
+        console.log("Tunnel already running");
+      }
+
+      finalUrl = `https://${process.env.NGROK_STATIC_DOMAIN}/${deploymentId}`;
     }
 
     // =====================================
