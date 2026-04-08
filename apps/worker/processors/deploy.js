@@ -114,9 +114,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       // create ngrok tunnel for this port
       await pushLog(deploymentId, "🔗 Creating public URL...");
-      try {
-        await ngrok.disconnectAll();
-      } catch (e) {}
+      
       const listener = await ngrok.forward({
         addr: port,
         authtoken: process.env.NGROK_AUTHTOKEN,
@@ -154,21 +152,15 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       await pushLog(deploymentId, `🚀 Local URL: http://localhost:${port}`);
 
- 
+      // create ngrok tunnel
       await pushLog(deploymentId, "🔗 Creating public URL...");
+      
+      const listener = await ngrok.forward({
+        addr: port,
+        authtoken: process.env.NGROK_AUTHTOKEN,
+      });
 
-      try {
-        await ngrok.forward({
-          addr: 3500,
-          authtoken: process.env.NGROK_AUTHTOKEN,
-          domain: process.env.NGROK_STATIC_DOMAIN,
-        });
-      } catch (e) {
-        // tunnel already exists, that's fine
-        console.log("Tunnel already running");
-      }
-
-      finalUrl = `https://${process.env.NGROK_STATIC_DOMAIN}/${deploymentId}`;
+      finalUrl = listener.url();
     }
 
     // =====================================
