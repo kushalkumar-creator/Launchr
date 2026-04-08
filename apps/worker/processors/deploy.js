@@ -69,12 +69,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execPromise(
-        `bash -c "source ~/.nvm/nvm.sh && nvm use 20 && npm run build"`,
-        {
-          cwd: projectPath,
-        },
-      );
+      await execPromise("npm build", { cwd: projectPath });
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
