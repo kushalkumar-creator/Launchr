@@ -1,3 +1,8 @@
 [phases.setup]
-aptPkgs = ["git"]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_20", "git"]
+
+[phases.install]
+cmds = ["npm install"]
+
+[start]
+cmd = "node index.js"
