@@ -49,16 +49,9 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     await pushLog(deploymentId, "📥 Cloning repository...");
     await execPromise(`git clone ${repoUrl} ${projectPath}`);
 
-    async function execWithNode20(command, cwd) {
-      return execPromise(
-        `export PATH=$(npm bin -g):$PATH && npx -y node@20 bash -c "${command}"`,
-        { cwd },
-      );
-    }
-
     // install dependencies
     await pushLog(deploymentId, "📦 Installing dependencies...");
-    await execWithNode20("npm install", projectPath);
+    await execPromise("npm install", { cwd: projectPath });
 
     // read package.json
     const packageJsonPath = path.join(projectPath, "package.json");
@@ -76,7 +69,13 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execWithNode20("npm run build", projectPath);
+      await execPromise(buildCmd || "npm run build", {
+        cwd: projectPath,
+        env: {
+          ...process.env,
+          NODE_ENV: "production",
+        },
+      });
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
