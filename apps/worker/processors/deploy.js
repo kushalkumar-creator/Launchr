@@ -51,7 +51,13 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
     // install dependencies
     await pushLog(deploymentId, "📦 Installing dependencies...");
-    await execPromise("npm install", { cwd: projectPath });
+    await execPromise("npm install --legacy-peer-deps", {
+      cwd: projectPath,
+      env: {
+        ...process.env,
+        NODE_ENV: "development", // ← critical fix
+      },
+    });
 
     // read package.json
     const packageJsonPath = path.join(projectPath, "package.json");
@@ -69,7 +75,13 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
       await pushLog(deploymentId, "⚛️ React/Vite app detected");
       await pushLog(deploymentId, "🏗️ Building project...");
 
-      await execPromise("npm run build", { cwd: projectPath });
+      await execPromise(buildCmd || "npm run build", {
+        cwd: projectPath,
+        env: {
+          ...process.env,
+          NODE_ENV: "production", // ← switch back to production for build
+        },
+      });
 
       // find build output folder
       const distPath = path.join(projectPath, "dist");
@@ -109,7 +121,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       // create ngrok tunnel for this port
       await pushLog(deploymentId, "🔗 Creating public URL...");
-      
+
       const listener = await ngrok.forward({
         addr: port,
         authtoken: process.env.NGROK_AUTHTOKEN,
@@ -149,7 +161,7 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
       // create ngrok tunnel
       await pushLog(deploymentId, "🔗 Creating public URL...");
-      
+
       const listener = await ngrok.forward({
         addr: port,
         authtoken: process.env.NGROK_AUTHTOKEN,
