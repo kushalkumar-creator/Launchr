@@ -50,22 +50,31 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     await execPromise(`git clone ${repoUrl} ${projectPath}`);
 
     // install dependencies
-  
-    await pushLog(deploymentId, "📦 Installing dependencies...");
+    await pushLog(deploymentId, "📦 Installing dependencies...")
 
-    // delete package-lock.json
-    const lockFilePath = path.join(projectPath, "package-lock.json");
-    if (fs.existsSync(lockFilePath)) {
-      fs.unlinkSync(lockFilePath);
-    }
+// delete package-lock.json
+const lockFilePath = path.join(projectPath, "package-lock.json")
+if (fs.existsSync(lockFilePath)) {
+  fs.unlinkSync(lockFilePath)
+}
 
-    // clean install
-    await execPromise("npm install", { cwd: projectPath });
+// main install
+await execPromise("npm install", { cwd: projectPath })
 
-    // force install the missing rolldown binding directly
-    await execPromise("npm install @rolldown/binding-linux-x64-gnu --no-save", {
-      cwd: projectPath,
-    }).catch(() => {}); // ignore if not needed
+// install all common missing linux bindings
+const bindings = [
+  "@rolldown/binding-linux-x64-gnu",
+  "@tailwindcss/oxide-linux-x64-gnu",
+  "lightningcss-linux-x64-gnu",
+  "esbuild-linux-64",
+]
+
+for (const binding of bindings) {
+  await execPromise(
+    `npm install ${binding} --no-save --prefer-offline`,
+    { cwd: projectPath }
+  ).catch(() => {})
+}
 
     // read package.json
     const packageJsonPath = path.join(projectPath, "package.json");
