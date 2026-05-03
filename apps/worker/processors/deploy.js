@@ -50,18 +50,28 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     await execPromise(`git clone ${repoUrl} ${projectPath}`);
 
     // install dependencies
+    // install dependencies
     await pushLog(deploymentId, "📦 Installing dependencies...");
-    
+
+    // delete package-lock.json to fix optional dependency bug
     const lockFilePath = path.join(projectPath, "package-lock.json");
     if (fs.existsSync(lockFilePath)) {
       fs.unlinkSync(lockFilePath);
     }
 
-    await execPromise("npm install --legacy-peer-deps", {
+    // write .npmrc to force optional deps
+    fs.writeFileSync(
+      path.join(projectPath, ".npmrc"),
+      "omit=\noptional=true\n",
+    );
+
+    // install with all optional dependencies
+    await execPromise("npm install --include=optional --legacy-peer-deps", {
       cwd: projectPath,
       env: {
         ...process.env,
-        NODE_ENV: "development", // ← critical fix
+        NODE_ENV: "development",
+        npm_config_production: "false",
       },
     });
 
