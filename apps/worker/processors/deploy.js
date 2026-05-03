@@ -50,30 +50,22 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
     await execPromise(`git clone ${repoUrl} ${projectPath}`);
 
     // install dependencies
-    // install dependencies
+  
     await pushLog(deploymentId, "📦 Installing dependencies...");
 
-    // delete package-lock.json to fix optional dependency bug
+    // delete package-lock.json
     const lockFilePath = path.join(projectPath, "package-lock.json");
     if (fs.existsSync(lockFilePath)) {
       fs.unlinkSync(lockFilePath);
     }
 
-    // write .npmrc to force optional deps
-    fs.writeFileSync(
-      path.join(projectPath, ".npmrc"),
-      "omit=\noptional=true\n",
-    );
+    // clean install
+    await execPromise("npm install", { cwd: projectPath });
 
-    // install with all optional dependencies
-    await execPromise("npm install --include=optional --legacy-peer-deps", {
+    // force install the missing rolldown binding directly
+    await execPromise("npm install @rolldown/binding-linux-x64-gnu --no-save", {
       cwd: projectPath,
-      env: {
-        ...process.env,
-        NODE_ENV: "development",
-        npm_config_production: "false",
-      },
-    });
+    }).catch(() => {}); // ignore if not needed
 
     // read package.json
     const packageJsonPath = path.join(projectPath, "package.json");
