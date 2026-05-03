@@ -51,6 +51,12 @@ async function deployProcessor({ deploymentId, repoUrl, buildCmd }) {
 
     // install dependencies
     await pushLog(deploymentId, "📦 Installing dependencies...");
+    
+    const lockFilePath = path.join(projectPath, "package-lock.json");
+    if (fs.existsSync(lockFilePath)) {
+      fs.unlinkSync(lockFilePath);
+    }
+
     await execPromise("npm install --legacy-peer-deps", {
       cwd: projectPath,
       env: {
